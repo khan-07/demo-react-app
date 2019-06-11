@@ -43,8 +43,10 @@ class NoteView (APIView):
 
         json_body = json.loads(request.body)
         # check if note is empty
+
         if json_body['note'] != '':
-            samplenote = Note(note=json_body['note'], userid=request.user.id)
+            userid = User.objects.filter(id=request.user.id)[0]
+            samplenote = Note(note=json_body['note'], userid=userid)
             samplenote.save()
 
             content = {'message': 'success'}
@@ -55,7 +57,10 @@ class NoteView (APIView):
             return Response(content)
 
     def get(self, request):
-        data = serializers.serialize("json", Note.objects.filter(userid=request.user.id))
+
+        userid = User.objects.filter(id=request.user.id)[0]
+
+        data = serializers.serialize("json", Note.objects.filter(userid=userid))
         print(data)
         content = {'message': 'success', 'data': data}
         return Response(content)
@@ -67,11 +72,13 @@ class LocationView (APIView):
     def post(self, request):
 
         json_body = json.loads(request.body)
-        print('Location Received with these coordinates', json_body['lat'],json_body['lng'],json_body['alt'])
+        print('Location Received with these coordinates', json_body['lat'], json_body['lng'], json_body['alt'])
 
         if json_body['lat'] != '' and json_body['lng'] != '' and json_body['alt'] != '':
+            userid = User.objects.filter(id=request.user.id)[0]
+
             samplelocation = Location(lat=json_body['lat'], long=json_body['lng'], alt=json_body['alt'],
-                                      userid=request.user.id)
+                                      userid=userid)
             samplelocation.save()
             content = {'message': 'success'}
 
